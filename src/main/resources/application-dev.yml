@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/graduation_photo?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8&useSSL=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 初始化大小，最小，最大
+    initialSize: 4
+    minIdle: 4
+    maxActive: 8
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    filters: stat,wall
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+swagger:
+  package_url: com.cafuc.graduation          #扫描包路径
+  title: 毕业照 Swagger2 接口描述
+  author: flyeat
+  website: https://flyeat.com
+  email:
+  version: 1.0.0
+  description: Copyright © 2020 - 2021 flyeat. 版权所有
+
+photo:
+  # 照片存放地址绝对路径
+  url: C:\Users\84612\Desktop\graduation\src\main\resources\photo\
+
+# 百度sdk包
+baidu:
+  APP_ID: 20049215
+  API_KEY: UGvEkZxdt37XdVAHTCrkGOw1
+  SECRET_KEY: zXS0tjHyXXFO7igQvHmwajIhF99k2IU8
