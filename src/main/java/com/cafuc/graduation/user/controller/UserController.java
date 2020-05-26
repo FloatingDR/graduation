@@ -8,7 +8,9 @@ import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.LoginBo;
 import com.cafuc.graduation.user.entity.bo.UpdateBo;
 import com.cafuc.graduation.user.entity.dto.UserDto;
+import com.cafuc.graduation.user.entity.po.LoginPo;
 import com.cafuc.graduation.user.entity.po.UserPo;
+import com.cafuc.graduation.user.service.ILoginService;
 import com.cafuc.graduation.user.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,9 +18,12 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * <p>
@@ -35,10 +40,12 @@ import java.util.Objects;
 public class UserController {
 
     private final IUserService userService;
+    private final ILoginService loginService;
 
     @Autowired
-    public UserController(IUserService userService) {
+    public UserController(IUserService userService, ILoginService loginService) {
         this.userService = userService;
+        this.loginService = loginService;
     }
 
     @PostMapping("/login")
@@ -58,16 +65,17 @@ public class UserController {
         return HttpResult.success(transPo2Dto(one), "登录成功");
     }
 
-    @PostMapping("/getByCondition")
-    @ApiOperation("条件获取用户信息")
-    public HttpResult<UserPo> getByCondition(@RequestBody @ApiParam("查询条件") UserPo userPo) {
-        UserPo one = userService.getOne(new QueryWrapper<>(userPo));
-        return one == null ? HttpResult.error("没有符合条件的信息") :
-                HttpResult.success(one);
+    @PostMapping("/filterByCondition")
+    @ApiOperation("根据条件过滤查找")
+    public HttpResult<List<UserPo>> getByCondition(@RequestBody @ApiParam("查询条件") UserPo userPo) {
+        List<UserPo> list = userService.list(new QueryWrapper<>(userPo));
+        return list == null ? HttpResult.error("没有符合条件的信息") :
+                HttpResult.success(list);
     }
 
     @PostMapping("/addUser")
     @ApiOperation("添加用户信息")
+    @Transactional(rollbackFor = Exception.class)
     public HttpResult<UserPo> addUser(@RequestBody @ApiParam("新增用户信息实体") InsertBo insertBo) {
         try {
             Objects.requireNonNull(insertBo.getUserNum(), "学号不能为空");
@@ -81,7 +89,14 @@ public class UserController {
         }
         UserPo userPo = new UserPo();
         BeanUtils.copyProperties(insertBo, userPo);
-        boolean save = userService.save(userPo);
+        userService.saveUser(userPo);
+
+        // 保存登录信息
+        Long userId = userPo.getId();
+        LoginPo loginPo = new LoginPo();
+        loginPo.setUserId(userId);
+        BeanUtils.copyProperties(insertBo, loginPo);
+        boolean save = loginService.save(loginPo);
         return save ? HttpResult.success(userPo, "上传成功") :
                 HttpResult.error("上传失败，请重试");
     }
@@ -101,10 +116,38 @@ public class UserController {
 
     @DeleteMapping("/deleteUser/{id}")
     @ApiOperation("删除用户信息")
+    @Transactional(rollbackFor = Exception.class)
     public HttpResult<Boolean> deleteUser(@PathVariable @ApiParam("用户id") Long id) {
-        boolean remove = userService.removeById(id);
-        return remove ? HttpResult.success(true, "删除成功") :
+        boolean removeUser = userService.removeById(id);
+        LoginPo loginPo = new LoginPo();
+        loginPo.setUserId(id);
+        boolean removeLogin = loginService.remove(new QueryWrapper<>(loginPo));
+        return removeUser && removeLogin ? HttpResult.success(true, "删除成功") :
                 HttpResult.error("删除失败");
+    }
+
+    @GetMapping("/queryUserRole/{id}")
+    @ApiOperation("查看用户角色")
+    public HttpResult<String> queryUserRole(@PathVariable @ApiParam("用户id") Long id) {
+        LoginPo loginPo = new LoginPo();
+        loginPo.setUserId(id);
+        LoginPo po = loginService.getOne(new QueryWrapper<>(loginPo));
+        if (po == null) {
+            return HttpResult.error("没有该用户的信息");
+        }
+        return HttpResult.success(po.getRole());
+    }
+
+    @PutMapping("/modifyUserRole/{id}/{role}")
+    @ApiOperation("修改用户角色")
+    public HttpResult<Boolean> modifyUserRole(@PathVariable @ApiParam("用户id") Long id,
+                                              @PathVariable @ApiParam("用户id") String role) {
+        LoginPo loginPo = new LoginPo();
+        loginPo.setUserId(id);
+        LoginPo po = loginService.getOne(new QueryWrapper<>(loginPo));
+        Optional.ofNullable(po).ifPresent(p -> p.setRole(role));
+        return loginService.updateById(po) ? HttpResult.success(true, "修改成功") :
+                HttpResult.error("修改失败");
     }
 
 

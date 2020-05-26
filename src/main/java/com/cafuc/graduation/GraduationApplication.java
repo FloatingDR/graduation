@@ -5,11 +5,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(scanBasePackages = "com.cafuc.graduation.**")
 @MapperScan("com.cafuc.graduation.**.dao")
 @EnableConfigurationProperties
 @EnableAsync
+@EnableTransactionManagement
 public class GraduationApplication {
 
     public static void main(String[] args) {

@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -76,6 +78,9 @@ public class PhotoController {
     @ApiOperation(value = "下载上传的原图", notes = "下载上传的原图")
     public ResponseEntity<byte[]> downloadOriginalPhoto(@PathVariable @ApiParam("用户id") Long userId) {
         UserPo userPo = userService.getById(userId);
+        if (userPo == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        }
         // 下载上传的原图
         return FileUtil.httpDownloadFile(userPo.getPhoto());
     }
@@ -85,6 +90,9 @@ public class PhotoController {
     @ApiOperation(value = "下载抠图后的图片", notes = "下载抠图后的图片")
     public ResponseEntity<byte[]> downloadAnalysedPhoto(@PathVariable @ApiParam("用户id") Long userId) {
         UserPo userPo = userService.getById(userId);
+        if (userPo == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        }
         // 下载之前验证一下抠图图片是否成功生成
         if (!userPo.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
             log.info("用户-{}获取抠图图片未上传成功", userId);
@@ -92,6 +100,30 @@ public class PhotoController {
         }
         // 下载抠图图片
         return FileUtil.httpDownloadFile(userPo.getAnalysedPhoto());
+    }
+
+    /**
+     * <p>
+     * 图片处理结果 MAP，用于构造消息返回提醒
+     * </p>
+     */
+    private Map<Integer, String> MESSAGE_MAP = new HashMap<Integer, String>() {{
+        put(Constant.ANALYSED_UNDO, "您的图片还未上传");
+        put(Constant.ANALYSED_ING, "您的图片正在处理，请稍后");
+        put(Constant.ANALYSED_FAIL, "图片处理失败，请重写上传");
+        put(Constant.ANALYSED_SUCCESS, "图片处理完成");
+    }};
+
+    @GetMapping("/state/analysedPhoto/{userId}")
+    @ApiOperation(value = "获取用户头像的AI处理结果", notes = "获取用户头像的AI处理结果")
+    public HttpResult<Integer> getAnalysedPhotoState(@PathVariable @ApiParam("用户id") Long userId) {
+        UserPo userPo = userService.getById(userId);
+        if (userPo == null) {
+            return HttpResult.error("该用户不存在");
+        }
+        Integer state = userPo.getAnalysedState();
+        String message = MESSAGE_MAP.get(state);
+        return HttpResult.success(state, message);
     }
 
 }

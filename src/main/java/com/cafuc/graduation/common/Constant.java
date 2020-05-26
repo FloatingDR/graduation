@@ -10,9 +10,17 @@ package com.cafuc.graduation.common;
  */
 public interface Constant {
 
+    //------------------------------------------------------------------
+    //        抠图图片状态
+    //------------------------------------------------------------------
+
+    // 未上传
     Integer ANALYSED_UNDO = 0;
+    // 处理中
     Integer ANALYSED_ING = 1;
+    // 处理失败
     Integer ANALYSED_FAIL = 2;
+    // 处理成功
     Integer ANALYSED_SUCCESS = 3;
 
 }

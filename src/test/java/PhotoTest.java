@@ -23,5 +23,8 @@ public class PhotoTest {
 
     @Test
     public void test() throws Exception {
+        Object o = null;
+        boolean b = false && o.getClass() != null ? true : false;
+        System.out.println(b);
     }
 }

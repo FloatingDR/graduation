@@ -1,6 +1,7 @@
 package com.cafuc.graduation.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.LoginBo;
 import com.cafuc.graduation.user.entity.po.UserPo;
 
@@ -25,4 +26,15 @@ public interface IUserService extends IService<UserPo> {
      * @date 2020/5/26 15:57
      */
     UserPo login(LoginBo loginBo);
+
+    /**
+     * <p>
+     * 新增用户
+     * </p>
+     *
+     * @param userPo userPo
+     * @author shijintao@supconit.com
+     * @date 2020/5/26 22:20
+     */
+    void saveUser(UserPo userPo);
 }
