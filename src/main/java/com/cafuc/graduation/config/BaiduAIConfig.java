@@ -2,8 +2,9 @@ package com.cafuc.graduation.config;
 
 import com.baidu.aip.bodyanalysis.AipBodyAnalysis;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 /**
  * <p>
@@ -17,17 +18,25 @@ import org.springframework.context.annotation.Configuration;
 public class BaiduAIConfig {
 
     @Value("${baidu.APP_ID}")
-    private String APP_ID;
+    private String app_id;
 
     @Value("${baidu.API_KEY}")
-    private String API_KEY;
+    private String api_key;
 
     @Value("${baidu.SECRET_KEY}")
-    private String SECRET_KEY;
+    private String secret_key;
+
+    private static String APP_ID;
+    private static String API_KEY;
+    private static String SECRET_KEY;
 
 
-    @Bean
-    public AipBodyAnalysis aipBodyAnalysis() {
+    @PostConstruct
+    void init() {
+        init(app_id, api_key, secret_key);
+    }
+
+    public static AipBodyAnalysis aipBodyAnalysis() {
         // 初始化一个AipBodyAnalysis
         AipBodyAnalysis client = new AipBodyAnalysis(APP_ID, API_KEY, SECRET_KEY);
 
@@ -37,4 +46,11 @@ public class BaiduAIConfig {
 
         return client;
     }
+
+    public static void init(String app_id, String api_key, String secret_key) {
+        APP_ID = app_id;
+        API_KEY = api_key;
+        SECRET_KEY = secret_key;
+    }
+
 }
