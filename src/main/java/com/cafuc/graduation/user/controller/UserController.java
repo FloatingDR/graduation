@@ -2,9 +2,11 @@ package com.cafuc.graduation.user.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
 import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.UpdateBo;
+import com.cafuc.graduation.user.entity.dto.UserDto;
 import com.cafuc.graduation.user.entity.po.UserPo;
 import com.cafuc.graduation.user.service.IPhotoService;
 import com.cafuc.graduation.user.service.IUserService;
@@ -95,33 +97,54 @@ public class UserController {
 
     @PostMapping("/upload/{id}")
     @ApiOperation(value = "上传照片", notes = "上传照片")
-    public HttpResult<UserPo> upload(@PathVariable @ApiParam("用户id") Long id,
-                                     @RequestParam("file") @ApiParam("照片") MultipartFile file) throws Exception {
+    public HttpResult<UserDto> upload(@PathVariable @ApiParam("用户id") Long id,
+                                      @RequestParam("file") @ApiParam("照片") MultipartFile file) throws Exception {
         String path;
         path = userService.upload(id, file);
 
         UserPo userPo = new UserPo();
         userPo.setId(id);
         userPo.setPhoto(path);
+        userPo.setAnalysedState(Constant.ANALYSED_UNDO);
         boolean update = userService.updateById(userPo);
-        UserPo newUser = userService.getById(id);
-
         try {
             // 异步抠图
             Future<String> future = userService.futureAnalyse(id);
             log.info("调度爬异步抠图线程为：{}", Thread.currentThread().getName());
 
             // 等待3s，如果没有完成异步返回
-            String analysedPhoto = future.get(1, TimeUnit.SECONDS);
+            String analysedPhoto = future.get(3, TimeUnit.SECONDS);
             userPo.setAnalysedPhoto(analysedPhoto);
         } catch (TimeoutException e) {
             log.info("AI 抠图超时，返回结果，后台正在执行...");
         }
-
-        return update && newUser != null ?
-                HttpResult.success(newUser) :
+        UserDto result = transPo2Dto(userPo);
+        return update ? HttpResult.success(result) :
                 HttpResult.error("上传失败");
 
+    }
+
+    //------------------------------------------------------------------
+    //        utils
+    //------------------------------------------------------------------
+
+    /**
+     * <p>
+     * 持久化类转为传输类
+     * </p>
+     *
+     * @param po 持久化类
+     * @return {@link UserDto }
+     * @author shijintao@supconit.com
+     * @date 2020/5/26 13:08
+     */
+    private UserDto transPo2Dto(UserPo po) {
+        UserDto result = new UserDto();
+        BeanUtils.copyProperties(po, result);
+        if (!po.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
+            result.setAnalysedPhoto(null);
+        }
+        return result;
     }
 
 

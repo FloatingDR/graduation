@@ -1,6 +1,7 @@
 package com.cafuc.graduation.user.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.exception.BaseException;
 import com.cafuc.graduation.user.dao.UserDao;
 import com.cafuc.graduation.user.entity.po.UserPo;
@@ -70,18 +71,26 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserPo> implements IUs
     @Override
     public Future<String> futureAnalyse(Long userId) {
         UserPo user = getById(userId);
+
+        UserPo userPo = new UserPo();
+        userPo.setId(userId);
+        // 抠图中
+        userPo.setAnalysedState(Constant.ANALYSED_ING);
         String analysedUrl = null;
         try {
             analysedUrl = photoService.foreground(user);
         } catch (Exception e) {
+            // 抠图失败
+            userPo.setAnalysedState(Constant.ANALYSED_FAIL);
             log.info("id为 {} 的头像AI扣取失败，失败原因{}", userId, e.getMessage());
         }
         Optional.ofNullable(analysedUrl).ifPresent(url -> {
-            UserPo userPo = new UserPo();
-            userPo.setId(userId);
+            // 抠图成功
+            userPo.setAnalysedState(Constant.ANALYSED_SUCCESS);
             userPo.setAnalysedPhoto(url);
-            updateById(userPo);
         });
+        // 保存图片位置及状态
+        updateById(userPo);
         log.info("id为 {} 的头像 AI 抠图已完成，图片已保存", userId);
         return new AsyncResult<>(analysedUrl);
     }
@@ -155,12 +164,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserPo> implements IUs
 //                .size(588,1290)
 //                .watermark(new Coordinate(185,27), person, 1.0f)
 //                .toFile("C:/Users/84612/Desktop/graduation/src/main/resources/photo/composite_result.png");
-        BufferedImage person = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/person2_analysed.png").size(230,310).asBufferedImage();
-        BufferedImage model = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/model.png").size(588,1290).asBufferedImage();
+        BufferedImage person = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/person2_analysed.png").size(230, 310).asBufferedImage();
+        BufferedImage model = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/model.png").size(588, 1290).asBufferedImage();
         Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/model.png")   //底图
-                .size(588,1290)     //必需，底图大小
-                .watermark(new Coordinate(185,27), person, 1.0f)    //水印1 watermark(position，image，opacity)
-                .watermark(Positions.CENTER,model,1.0f)     //水印2
+                .size(588, 1290)     //必需，底图大小
+                .watermark(new Coordinate(185, 27), person, 1.0f)    //水印1 watermark(position，image，opacity)
+                .watermark(Positions.CENTER, model, 1.0f)     //水印2
                 .toFile("C:/Users/84612/Desktop/graduation/src/main/resources/photo/composite_result.png");     //输出图片
     }
 }

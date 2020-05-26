@@ -1,16 +1,13 @@
 package com.cafuc.graduation.user.entity.po;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -51,5 +48,8 @@ public class UserPo implements Serializable {
 
     @ApiModelProperty(value = "抠图后的图片地址", example = "D://user/photo/9df6897a52744983bdc8b844e4c2d7b9_20160511000_analysed.jpeg")
     private String analysedPhoto;
+
+    @ApiModelProperty(value = "抠图结果 0 - 未上传；1 - 上传中；2 - 上传失败；3 - 上传成功；", example = "0")
+    private Integer analysedState;
 
 }
