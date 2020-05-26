@@ -8,7 +8,6 @@ CREATE TABLE `login` (
   `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
   `password` varchar(50) COLLATE utf8_bin DEFAULT '0000' COMMENT '密码，默认 0000',
   `role` varchar(50) COLLATE utf8_bin DEFAULT 'student' COMMENT '角色：student(普通学生),monitor（班长），teacher（辅导员），admin（系统管理员）\n默认student',
-  `role_priority` int(11) DEFAULT '0' COMMENT '角色优先级，0-10，优先级依次增大，默认为0（最低）',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='系统登录表';
 
@@ -16,7 +15,7 @@ CREATE TABLE `login` (
 -- Records of login
 -- ----------------------------
 BEGIN;
-INSERT INTO `login` VALUES (1, 5, '0000', 'student', 0);
+INSERT INTO `login` VALUES (1, 5, '0000', 'student');
 COMMIT;
 
 -- ----------------------------

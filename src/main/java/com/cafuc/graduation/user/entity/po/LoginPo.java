@@ -37,7 +37,4 @@ public class LoginPo implements Serializable {
     @ApiModelProperty(value = "角色：student(普通学生),monitor（班长），teacher（辅导员），admin（系统管理员）", example = "student")
     private String role;
 
-    @ApiModelProperty(value = "角色优先级，0-10，优先级依次增大，默认为0（最低）", example = "0")
-    private Integer rolePriority;
-
 }
