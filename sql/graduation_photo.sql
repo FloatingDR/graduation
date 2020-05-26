@@ -16,7 +16,7 @@ create table user
 3 - 上传成功；'
 )
     comment '用户表' charset = utf8;
-
+BEGIN;
 INSERT INTO graduation_photo.user (id, user_num, user_name, college, profession, class_name, photo, analysed_photo, analysed_state) VALUES (3, '20160511000', 'lisi', '计算机学院', '计算机科学与技术', '1602', '/Users/taylor/springboot/graduation/src/main/resources/photo/0aec8407bde64a30ab54c13de8831ca9_20160511000.jpeg', '/Users/taylor/springboot/graduation/src/main/resources/photo/0aec8407bde64a30ab54c13de8831ca9_20160511000_analysed.png', 3);
-
+COMMIT;
 
