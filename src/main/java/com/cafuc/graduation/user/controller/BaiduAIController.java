@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020/5/26 14:28
  */
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/baidu_ai")
 @Api(tags = "百度AI")
@@ -35,7 +34,7 @@ public class BaiduAIController {
      * @author shijintao@supconit.com
      * @date 2020/5/26 14:34
      */
-    @PostMapping("/dynamic_config/{appId}/{appKey}/{secretKey}")
+    @PutMapping("/dynamic_config/{appId}/{appKey}/{secretKey}")
     @ApiOperation(value = "动态配置百度AI", notes = "动态配置百度AI，不用重启服务器")
     public HttpResult<Boolean> dynamicConfig(@PathVariable @ApiParam("用户id") String appId,
                                              @PathVariable @ApiParam("用户id") String appKey,

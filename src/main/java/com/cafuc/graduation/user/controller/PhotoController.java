@@ -3,7 +3,6 @@ package com.cafuc.graduation.user.controller;
 
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
-import com.cafuc.graduation.user.entity.dto.UserDto;
 import com.cafuc.graduation.user.entity.po.UserPo;
 import com.cafuc.graduation.user.service.IPhotoService;
 import com.cafuc.graduation.user.service.IUserService;
@@ -12,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +30,6 @@ import java.util.concurrent.TimeoutException;
  * @date 2020/5/26 13:30
  */
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/photo")
 @Api(tags = "照片")

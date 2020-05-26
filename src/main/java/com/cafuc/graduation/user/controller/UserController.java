@@ -29,7 +29,6 @@ import java.util.Objects;
  * @since 2020-05-25
  */
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping("/user")
 @Api(tags = "用户")
@@ -52,8 +51,11 @@ public class UserController {
             return HttpResult.error("登录失败，%s", e.getMessage());
         }
         UserPo one = userService.login(loginBo);
-        return one != null ? HttpResult.success(transPo2Dto(one), "登录成功") :
-                HttpResult.error("登录失败，请重试");
+
+        if (one == null) {
+            return HttpResult.error("登录失败，请重试");
+        }
+        return HttpResult.success(transPo2Dto(one), "登录成功");
     }
 
     @PostMapping("/getByCondition")
