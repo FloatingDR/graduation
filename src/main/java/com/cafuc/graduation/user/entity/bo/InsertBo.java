@@ -24,6 +24,9 @@ public class InsertBo implements Serializable {
     @ApiModelProperty(value = "姓名", example = "张三")
     private String userName;
 
+    @ApiModelProperty(value = "密码，默认为 0000", example = "0000")
+    private String password;
+
     @ApiModelProperty(value = "学院", example = "计算机学院")
     private String college;
 

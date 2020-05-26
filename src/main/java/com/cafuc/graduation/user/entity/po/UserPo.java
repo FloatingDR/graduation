@@ -31,6 +31,9 @@ public class UserPo implements Serializable {
     @ApiModelProperty(value = "学号", example = "20160511000")
     private String userNum;
 
+    @ApiModelProperty(value = "密码，默认 0000 ", example = "0000")
+    private String password;
+
     @ApiModelProperty(value = "姓名", example = "张三")
     private String userName;
 

@@ -2,9 +2,12 @@ package com.cafuc.graduation.user.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
 import com.cafuc.graduation.user.entity.bo.InsertBo;
+import com.cafuc.graduation.user.entity.bo.LoginBo;
 import com.cafuc.graduation.user.entity.bo.UpdateBo;
+import com.cafuc.graduation.user.entity.dto.UserDto;
 import com.cafuc.graduation.user.entity.po.UserPo;
 import com.cafuc.graduation.user.service.IUserService;
 import io.swagger.annotations.Api;
@@ -39,6 +42,20 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping("/login")
+    @ApiOperation("登录")
+    public HttpResult<UserDto> login(@RequestBody @ApiParam("登录实体") LoginBo loginBo) {
+        try {
+            Objects.requireNonNull(loginBo.getUserNum(), "学号不能为空");
+            Objects.requireNonNull(loginBo.getPassword(), "密码不能为空");
+        } catch (NullPointerException e) {
+            return HttpResult.error("登录失败，%s", e.getMessage());
+        }
+        UserPo one = userService.login(loginBo);
+        return one != null ? HttpResult.success(transPo2Dto(one), "登录成功") :
+                HttpResult.error("登录失败，请重试");
+    }
+
     @PostMapping("/getByCondition")
     @ApiOperation("条件获取用户信息")
     public HttpResult<UserPo> getByCondition(@RequestBody @ApiParam("查询条件") UserPo userPo) {
@@ -51,7 +68,7 @@ public class UserController {
     @ApiOperation("添加用户信息")
     public HttpResult<UserPo> addUser(@RequestBody @ApiParam("新增用户信息实体") InsertBo insertBo) {
         try {
-            Objects.requireNonNull(insertBo.getUserName(), "学号不能为空");
+            Objects.requireNonNull(insertBo.getUserNum(), "学号不能为空");
             Objects.requireNonNull(insertBo.getUserName(), "姓名不能为空");
             Objects.requireNonNull(insertBo.getCollege(), "学院不能为空");
             Objects.requireNonNull(insertBo.getProfession(), "专业不能为空");
@@ -86,6 +103,31 @@ public class UserController {
         boolean remove = userService.removeById(id);
         return remove ? HttpResult.success(true, "删除成功") :
                 HttpResult.error("删除失败");
+    }
+
+
+    //------------------------------------------------------------------
+    //        utils
+    //------------------------------------------------------------------
+
+
+    /**
+     * <p>
+     * 持久化类转为传输类
+     * </p>
+     *
+     * @param po 持久化类
+     * @return {@link UserDto }
+     * @author shijintao@supconit.com
+     * @date 2020/5/26 13:08
+     */
+    private UserDto transPo2Dto(UserPo po) {
+        UserDto result = new UserDto();
+        BeanUtils.copyProperties(po, result);
+        if (!po.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
+            result.setAnalysedPhoto(null);
+        }
+        return result;
     }
 
 }

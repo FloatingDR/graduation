@@ -97,28 +97,4 @@ public class PhotoController {
         return FileUtil.httpDownloadFile(userPo.getAnalysedPhoto());
     }
 
-
-    //------------------------------------------------------------------
-    //        utils
-    //------------------------------------------------------------------
-
-    /**
-     * <p>
-     * 持久化类转为传输类
-     * </p>
-     *
-     * @param po 持久化类
-     * @return {@link UserDto }
-     * @author shijintao@supconit.com
-     * @date 2020/5/26 13:08
-     */
-    private UserDto transPo2Dto(UserPo po) {
-        UserDto result = new UserDto();
-        BeanUtils.copyProperties(po, result);
-        if (!po.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
-            result.setAnalysedPhoto(null);
-        }
-        return result;
-    }
-
 }
