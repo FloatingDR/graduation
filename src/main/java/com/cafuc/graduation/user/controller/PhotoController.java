@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,48 +96,6 @@ public class PhotoController {
                 HttpResult.error("上传失败");
 
     }
-
-//    @PostMapping("/upload/{id}")
-//    @ApiOperation(value = "上传照片", notes = "上传照片")
-//    public HttpResult<Boolean> upload(@PathVariable @ApiParam("用户id") Long id,
-//                                      HttpServletRequest request) throws Exception {
-//        MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
-//        MultipartFile file = req.getFile("file");
-//
-//        // 先检测是还可以调用该接口
-//        if (interfaceConfineService.getByUserId(id) != null) {
-//            String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
-//            String[] invokingArr = invokingAble.split("_");
-//            int residue = Integer.parseInt(invokingArr[0]);
-//            String limitInfo = invokingArr[1];
-//            if (residue <= 0 && limitInfo.equals("limited")) {
-//                return HttpResult.error("您的上传次数已用完");
-//            }
-//        }
-//
-//        String path;
-//        path = photoService.upload(id, file);
-//
-//        UserPo userPo = new UserPo();
-//        userPo.setId(id);
-//        userPo.setPhoto(path);
-//        userPo.setAnalysedState(Constant.ANALYSED_UNDO);
-//        boolean update = userService.updateById(userPo);
-//        try {
-//            // 异步抠图
-//            Future<String> future = photoService.futureAnalyse(id);
-//            log.info("调度爬异步抠图线程为：{}", Thread.currentThread().getName());
-//
-//            // 等待3s，如果没有完成异步返回
-//            String analysedPhoto = future.get(3, TimeUnit.SECONDS);
-//            userPo.setAnalysedPhoto(analysedPhoto);
-//        } catch (TimeoutException e) {
-//            log.info("AI 抠图超时，返回结果，后台正在执行...");
-//        }
-//        return update ? HttpResult.success(true, "上传成功") :
-//                HttpResult.error("上传失败");
-//
-//    }
 
     @GetMapping("/download/originalPhoto/{userId}")
     @ApiOperation(value = "下载上传的原图", notes = "下载上传的原图")
