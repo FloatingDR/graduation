@@ -1,8 +1,10 @@
 package com.cafuc.graduation.user.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
+import com.cafuc.graduation.user.entity.po.InterfaceConfinePo;
 import com.cafuc.graduation.user.entity.po.UserPo;
 import com.cafuc.graduation.user.service.IInterfaceConfineService;
 import com.cafuc.graduation.user.service.IPhotoService;
@@ -58,12 +60,14 @@ public class PhotoController {
     public HttpResult<Boolean> upload(@PathVariable @ApiParam("用户id") Long id,
                                       @RequestParam("file") @ApiParam("照片") MultipartFile file) throws Exception {
         // 先检测是还可以调用该接口
-        String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
-        String[] invokingArr = invokingAble.split("_");
-        int residue = Integer.parseInt(invokingArr[0]);
-        String limitInfo = invokingArr[1];
-        if (residue <= 0 && limitInfo.equals("limited")) {
-            return HttpResult.error("您的上传次数已用完");
+        if (interfaceConfineService.getByUserId(id) != null) {
+            String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
+            String[] invokingArr = invokingAble.split("_");
+            int residue = Integer.parseInt(invokingArr[0]);
+            String limitInfo = invokingArr[1];
+            if (residue <= 0 && limitInfo.equals("limited")) {
+                return HttpResult.error("您的上传次数已用完");
+            }
         }
 
         String path;

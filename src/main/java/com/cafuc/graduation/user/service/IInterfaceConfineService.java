@@ -38,5 +38,16 @@ public interface IInterfaceConfineService extends IService<InterfaceConfinePo> {
      */
     String queryInvokingAble(Long userId, String interfacePath);
 
+    /**
+     * <p>
+     * 根据userId获取一条数记录
+     * </p>
+     *
+     * @param userId userId
+     * @return {@link InterfaceConfinePo }
+     * @author shijintao@supconit.com
+     * @date 2020/5/27 13:39
+     */
+    InterfaceConfinePo getByUserId(Long userId);
 
 }

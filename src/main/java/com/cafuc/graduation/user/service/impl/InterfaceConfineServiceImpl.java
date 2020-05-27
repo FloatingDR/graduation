@@ -1,6 +1,7 @@
 package com.cafuc.graduation.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -63,6 +64,13 @@ public class InterfaceConfineServiceImpl extends ServiceImpl<InterfaceConfineDao
         else {
             return res + "_unlimited";
         }
+    }
+
+    @Override
+    public InterfaceConfinePo getByUserId(Long userId) {
+        InterfaceConfinePo interfaceConfinePo = new InterfaceConfinePo();
+        interfaceConfinePo.setUserId(userId);
+        return getOne(new QueryWrapper<>(interfaceConfinePo));
     }
 
     /**
