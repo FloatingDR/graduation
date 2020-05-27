@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/baidu_ai")
-@Api(tags = "百度AI")
+@Api(tags = "百度AI接口")
 public class BaiduAIController {
 
     /**

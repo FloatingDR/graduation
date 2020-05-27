@@ -36,7 +36,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-@Api(tags = "用户")
+@Api(tags = "用户接口")
 public class UserController {
 
     private final IUserService userService;

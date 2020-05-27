@@ -39,7 +39,7 @@ public class CodeGenerator {
     /**
      * 表名
      */
-    private static final String TABLE_NAME = "login";
+    private static final String TABLE_NAME = "user_interface_confine";
 
     /**
      * 包名

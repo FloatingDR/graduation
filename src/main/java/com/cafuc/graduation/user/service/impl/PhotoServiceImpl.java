@@ -3,7 +3,10 @@ package com.cafuc.graduation.user.service.impl;
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.config.BaiduAIConfig;
 import com.cafuc.graduation.exception.BaseException;
+import com.cafuc.graduation.user.entity.bo.InterfaceConfineBo;
+import com.cafuc.graduation.user.entity.po.InterfaceConfinePo;
 import com.cafuc.graduation.user.entity.po.UserPo;
+import com.cafuc.graduation.user.service.IInterfaceConfineService;
 import com.cafuc.graduation.user.service.IPhotoService;
 import com.cafuc.graduation.user.service.IUserService;
 import com.cafuc.graduation.util.FileUtil;
@@ -46,11 +49,22 @@ public class PhotoServiceImpl implements IPhotoService {
     @Value("${photo.url}")
     private String path;
 
+    @Value("${interfaceLimit.photoAnalyse.interfaceName}")
+    private String photoAnalyseInterfaceName;
+
+    @Value("${interfaceLimit.photoAnalyse.interfacePath}")
+    private String photoAnalyseInterfacePath;
+
+    @Value("${interfaceLimit.photoAnalyse.confineCount}")
+    private Integer photoAnalyseConfineCount;
+
     private final IUserService userService;
+    private final IInterfaceConfineService interfaceConfineService;
 
     @Autowired
-    public PhotoServiceImpl(IUserService userService) {
+    public PhotoServiceImpl(IUserService userService, IInterfaceConfineService interfaceConfineService) {
         this.userService = userService;
+        this.interfaceConfineService = interfaceConfineService;
     }
 
     @Override
@@ -95,6 +109,12 @@ public class PhotoServiceImpl implements IPhotoService {
         // 保存图片位置及状态
         userService.updateById(userPo);
         log.info("id为 {} 的头像 AI 抠图工作已完成", userId);
+
+        // 限制调用次数
+        InterfaceConfineBo interfaceConfineBo = new InterfaceConfineBo(userId, photoAnalyseInterfaceName,
+                photoAnalyseInterfacePath, photoAnalyseConfineCount, true);
+        interfaceConfineService.addOrAutoIncrease(interfaceConfineBo);
+
         return new AsyncResult<>(analysedUrl);
     }
 

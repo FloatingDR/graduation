@@ -5,3 +5,14 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 100MB
+
+# 接口限制
+interfaceLimit:
+  # 上传照片或AI抠图接口（它们目前属于同一个请求接口中）
+  photoAnalyse:
+    # 接口名称
+    interfaceName: 人像AI抠图
+    # 接口路径
+    interfacePath: /photo/upload
+    # 接口当天使用次数
+    confineCount: 5

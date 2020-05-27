@@ -39,7 +39,41 @@ CREATE TABLE `user` (
 -- Records of user
 -- ----------------------------
 BEGIN;
-INSERT INTO `user` VALUES (5, '20160511000', '张三', '计算机学院', '计算机科学与技术', '1602', '/Users/taylor/springboot/graduation/src/main/resources/photo/a66b554a8e8a483682e33152b003b83e_20160511000.jpeg', '/Users/taylor/springboot/graduation/src/main/resources/photo/a66b554a8e8a483682e33152b003b83e_20160511000_analysed.png', 3);
+INSERT INTO `user` VALUES (5, '20160511000', '张三', '计算机学院', '计算机科学与技术', '1602', '/Users/taylor/springboot/graduation/src/main/resources/photo/c3ef55c5e2a747a3823e0fa6792a77d9_20160511000.jpeg', '/Users/taylor/springboot/graduation/src/main/resources/photo/c3ef55c5e2a747a3823e0fa6792a77d9_20160511000_analysed.png', 3);
 COMMIT;
+
+-- ----------------------------
+-- Table structure for user_interface_confine
+-- ----------------------------
+DROP TABLE IF EXISTS `user_interface_confine`;
+CREATE TABLE `user_interface_confine` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
+  `user_invoke_count` int(11) DEFAULT NULL COMMENT '用户已调用次数',
+  `interface_name` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '接口描述',
+  `interface_path` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '接口地址',
+  `confine_count` int(11) DEFAULT NULL COMMENT '限制调用次数',
+  `invoking_forbid` bit(1) DEFAULT b'1' COMMENT '超出调用次数是否限制 0：不限制 1：限制；默认限制',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='用户-接口限制，限制调用次数';
+
+-- ----------------------------
+-- Records of user_interface_confine
+-- ----------------------------
+BEGIN;
+INSERT INTO `user_interface_confine` VALUES (1, 5, 4, '人像AI抠图', '/photo/upload', 4, b'1', '2020-05-27 10:17:21');
+COMMIT;
+
+-- ----------------------------
+-- Triggers structure for table user_interface_confine
+-- ----------------------------
+DROP TRIGGER IF EXISTS `user_interface_confine_update_time`;
+delimiter ;;
+CREATE TRIGGER `user_interface_confine_update_time` BEFORE UPDATE ON `user_interface_confine` FOR EACH ROW begin
+    set new.update_time= CURRENT_TIMESTAMP;
+end
+;;
+delimiter ;
 
 SET FOREIGN_KEY_CHECKS = 1;

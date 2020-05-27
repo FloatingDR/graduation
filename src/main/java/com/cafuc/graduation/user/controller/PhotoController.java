@@ -4,6 +4,7 @@ package com.cafuc.graduation.user.controller;
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
 import com.cafuc.graduation.user.entity.po.UserPo;
+import com.cafuc.graduation.user.service.IInterfaceConfineService;
 import com.cafuc.graduation.user.service.IPhotoService;
 import com.cafuc.graduation.user.service.IUserService;
 import com.cafuc.graduation.util.FileUtil;
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,22 +36,36 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @RestController
 @RequestMapping("/photo")
-@Api(tags = "照片")
+@Api(tags = "照片接口")
 public class PhotoController {
+
+    @Value("${interfaceLimit.photoAnalyse.interfacePath}")
+    private String photoAnalyseInterfacePath;
 
     private final IUserService userService;
     private final IPhotoService photoService;
+    private final IInterfaceConfineService interfaceConfineService;
 
     @Autowired
-    public PhotoController(IUserService userService, IPhotoService photoService) {
+    public PhotoController(IUserService userService, IPhotoService photoService, IInterfaceConfineService interfaceConfineService) {
         this.userService = userService;
         this.photoService = photoService;
+        this.interfaceConfineService = interfaceConfineService;
     }
 
     @PostMapping("/upload/{id}")
     @ApiOperation(value = "上传照片", notes = "上传照片")
     public HttpResult<Boolean> upload(@PathVariable @ApiParam("用户id") Long id,
                                       @RequestParam("file") @ApiParam("照片") MultipartFile file) throws Exception {
+        // 先检测是还可以调用该接口
+        String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
+        String[] invokingArr = invokingAble.split("_");
+        int residue = Integer.parseInt(invokingArr[0]);
+        String limitInfo = invokingArr[1];
+        if (residue <= 0 && limitInfo.equals("limited")) {
+            return HttpResult.error("您的上传次数已用完");
+        }
+
         String path;
         path = photoService.upload(id, file);
 
