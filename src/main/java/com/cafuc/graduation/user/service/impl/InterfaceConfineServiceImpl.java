@@ -77,7 +77,7 @@ public class InterfaceConfineServiceImpl extends ServiceImpl<InterfaceConfineDao
     public void reCountInterface() {
         LambdaUpdateWrapper<InterfaceConfinePo> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.set(InterfaceConfinePo::getUserInvokeCount, 0);
-        update();
+        update(updateWrapper);
     }
 
 }

@@ -50,9 +50,9 @@ public class InterfaceController {
         if (residue <= 0 && limitInfo.equals("limited")) {
             return HttpResult.error("您的上传次数已用完,请明天再试！");
         } else if (residue <= 0 && limitInfo.equals("unlimited")) {
-            return HttpResult.success(true, "您的上传次数还剩余%s,次数用完仍可上传，不受限制", residue);
+            return HttpResult.success(true, "您的上传次数还剩余%s次,次数用完仍可上传，不受限制", residue);
         } else {
-            return HttpResult.success(true, "您的上传次数还剩余%s,次数用完当天不可再上传", residue);
+            return HttpResult.success(true, "您的上传次数还剩余%s次,次数用完当天不可再上传", residue);
         }
     }
 
