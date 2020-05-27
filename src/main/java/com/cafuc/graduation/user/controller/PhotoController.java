@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,11 +56,11 @@ public class PhotoController {
         this.interfaceConfineService = interfaceConfineService;
     }
 
-    @PostMapping("/upload/{id}")
+    @PostMapping(value = "/upload/{id}")
     @ApiOperation(value = "上传照片", notes = "上传照片")
     public HttpResult<Boolean> upload(@PathVariable @ApiParam("用户id") Long id,
-                                      @RequestParam("file") @ApiParam("照片") MultipartFile file) throws Exception {
-        // 先检测是还可以调用该接口
+                                      @RequestPart(name = "file") @ApiParam("照片") MultipartFile file) throws Exception {
+        // 先检测是否还可以调用该接口
         if (interfaceConfineService.getByUserId(id) != null) {
             String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
             String[] invokingArr = invokingAble.split("_");
