@@ -1,7 +1,9 @@
 package com.cafuc.graduation.user.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
 import com.cafuc.graduation.user.entity.bo.InsertBo;
@@ -68,7 +70,11 @@ public class UserController {
     @PostMapping("/filterByCondition")
     @ApiOperation("根据条件过滤查找")
     public HttpResult<List<UserPo>> getByCondition(@RequestBody @ApiParam("查询条件") UserPo userPo) {
-        List<UserPo> list = userService.list(new QueryWrapper<>(userPo));
+        LambdaQueryWrapper<UserPo> queryWrapper = new LambdaQueryWrapper<>(userPo);
+        // 按学号降序
+        queryWrapper.orderByAsc(UserPo::getUserNum);
+
+        List<UserPo> list = userService.list(queryWrapper);
         return list == null ? HttpResult.error("没有符合条件的信息") :
                 HttpResult.success(list);
     }

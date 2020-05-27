@@ -3,7 +3,6 @@ package com.cafuc.graduation.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cafuc.graduation.user.dao.InterfaceConfineDao;
 import com.cafuc.graduation.user.entity.bo.InterfaceConfineBo;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class InterfaceConfineServiceImpl extends ServiceImpl<InterfaceConfineDao, InterfaceConfinePo> implements IInterfaceConfineService {
-
 
     @Override
     public Boolean addOrAutoIncrease(InterfaceConfineBo bo) {
