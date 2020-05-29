@@ -41,6 +41,23 @@ swagger:
   version: 1.0.0
   description: Copyright © 2020 - 2021 flyeat. 版权所有
 
+# 百度sdk包
+baidu:
+  APP_ID: 20049215
+  API_KEY: UGvEkZxdt37XdVAHTCrkGOw1
+  SECRET_KEY: zXS0tjHyXXFO7igQvHmwajIhF99k2IU8
+
+# 模板
+model:
+  # 模板存放地址绝对路径
+  url: /Users/taylor/springboot/graduation/src/main/resources/model/
+
 photo:
+  # 学士服照片默认模板
+  modelId: 1
   # 照片存放地址绝对路径
-  url: C:\Users\84612\Desktop\graduation\src\main\resources\photo\
+  url: /Users/taylor/springboot/graduation/src/main/resources/photo/
+  # AI抠图照片后缀
+  analysed_suffix: analysed
+  # 学士服照片后缀
+  clothes_suffix: clothes

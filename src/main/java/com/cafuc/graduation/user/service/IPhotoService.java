@@ -51,7 +51,14 @@ public interface IPhotoService {
     String upload(Long userId, MultipartFile file) throws Exception;
 
 
-
-    void composite() throws Exception;
+    /**
+     * <p>
+     * 单人合成学士服照片
+     * </p>
+     *
+     * @param userPo     用户
+     * @param modelId    模板id
+     */
+    String composite(UserPo userPo, Long modelId);
 }
 

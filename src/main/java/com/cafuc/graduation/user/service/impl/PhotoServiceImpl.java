@@ -2,9 +2,9 @@ package com.cafuc.graduation.user.service.impl;
 
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.config.BaiduAIConfig;
-import com.cafuc.graduation.exception.BaseException;
+import com.cafuc.graduation.model.entity.po.ModelPo;
+import com.cafuc.graduation.model.service.IModelService;
 import com.cafuc.graduation.user.entity.bo.InterfaceConfineBo;
-import com.cafuc.graduation.user.entity.po.InterfaceConfinePo;
 import com.cafuc.graduation.user.entity.po.UserPo;
 import com.cafuc.graduation.user.service.IInterfaceConfineService;
 import com.cafuc.graduation.user.service.IPhotoService;
@@ -20,18 +20,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
 /**
@@ -49,6 +49,12 @@ public class PhotoServiceImpl implements IPhotoService {
     @Value("${photo.url}")
     private String path;
 
+    @Value("${photo.analysed_suffix}")
+    private String analysedSuffix;
+
+    @Value("${photo.clothes_suffix}")
+    private String clothesSuffix;
+
     @Value("${interfaceLimit.photoAnalyse.interfaceName}")
     private String photoAnalyseInterfaceName;
 
@@ -60,11 +66,14 @@ public class PhotoServiceImpl implements IPhotoService {
 
     private final IUserService userService;
     private final IInterfaceConfineService interfaceConfineService;
+    private final IModelService modelService;
 
     @Autowired
-    public PhotoServiceImpl(IUserService userService, IInterfaceConfineService interfaceConfineService) {
+    public PhotoServiceImpl(IUserService userService, IInterfaceConfineService interfaceConfineService,
+                            IModelService modelService) {
         this.userService = userService;
         this.interfaceConfineService = interfaceConfineService;
+        this.modelService = modelService;
     }
 
     @Override
@@ -80,7 +89,7 @@ public class PhotoServiceImpl implements IPhotoService {
         JSONObject res = BaiduAIConfig.aipBodyAnalysis().bodySeg(photo, options);
         String foreground = res.get("foreground").toString();
         byte[] bytes = Base64.getDecoder().decode(foreground);
-        return FileUtil.ByteToFile(bytes, photo);
+        return FileUtil.ByteToFile(bytes, photo, analysedSuffix);
     }
 
     @Async
@@ -105,6 +114,8 @@ public class PhotoServiceImpl implements IPhotoService {
             // 抠图成功
             userPo.setAnalysedState(Constant.ANALYSED_SUCCESS);
             userPo.setAnalysedPhoto(url);
+            // 学士服照片设置为空
+            userPo.setClothesPath("");
         });
         // 保存图片位置及状态
         userService.updateById(userPo);
@@ -120,39 +131,61 @@ public class PhotoServiceImpl implements IPhotoService {
 
     @Override
     public String upload(Long userId, MultipartFile file) throws Exception {
-        String fileName = getFileName(userId, file);
-        Path p = Paths.get(path + fileName);
-        Path newFile = null;
-        if (!Files.exists(p)) {
-            newFile = Files.createFile(p);
-        }
-        InputStream in = file.getInputStream();
-        assert newFile != null;
-        Files.copy(in, newFile, StandardCopyOption.REPLACE_EXISTING);
-        return path + fileName;
+        String fileName = getFileName(userId, path, file);
+        return FileUtil.saveFile(fileName, path, file);
     }
 
-
     @Override
-    public void composite() throws Exception {
-//        BufferedImage person = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/person_analysed.png").size(230,310).asBufferedImage();
-//        Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/model.png")
-//                .size(588,1290)
-//                .watermark(new Coordinate(185,27), person, 1.0f)
-//                .toFile("C:/Users/84612/Desktop/graduation/src/main/resources/photo/composite_result.png");
-        BufferedImage person = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/person2_analysed.png").size(230, 310).asBufferedImage();
-        BufferedImage model = Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/model.png").size(588, 1290).asBufferedImage();
-        Thumbnails.of("C:/Users/84612/Desktop/graduation/src/main/resources/photo/model.png")   //底图
-                .size(588, 1290)     //必需，底图大小
-                .watermark(new Coordinate(185, 27), person, 1.0f)    //水印1 watermark(position，image，opacity)
-                .watermark(Positions.CENTER, model, 1.0f)     //水印2
-                .toFile("C:/Users/84612/Desktop/graduation/src/main/resources/photo/composite_result.png");     //输出图片
+    public String composite(UserPo user, Long modelId) {
+        String clothesPath = composite(user, modelId, clothesSuffix);
+        if (StringUtils.isEmpty(clothesPath)) {
+            return null;
+        }
+        UserPo userPo = new UserPo();
+        userPo.setId(user.getId());
+        userPo.setClothesPath(clothesPath);
+        userService.updateById(userPo);
+        return clothesPath;
     }
 
 
     //------------------------------------------------------------------
     //        utils
     //------------------------------------------------------------------
+
+    /**
+     * <p>
+     * 合成学士服照片
+     * </p>
+     *
+     * @param userPo     user
+     * @param modelId    modelId
+     * @param saveSuffix 学士服照片后缀
+     * @return {@link String }
+     * @author shijintao@supconit.com
+     * @date 2020/5/29 10:27
+     */
+    public String composite(UserPo userPo, Long modelId, String saveSuffix) {
+        Objects.requireNonNull(userPo, "用户信息不能为空");
+        ModelPo modelPo = modelService.getById(modelId);
+        String modelPath = modelPo.getModelPath();
+        String analysedPhoto = userPo.getAnalysedPhoto();
+        String savePath = analysedPhoto.replace(analysedSuffix, saveSuffix);
+
+        try {
+            BufferedImage person = Thumbnails.of(analysedPhoto).size(230, 310).asBufferedImage();
+            BufferedImage model = Thumbnails.of(modelPath).size(588, 1290).asBufferedImage();
+            Thumbnails.of(modelPath)   //底图
+                    .size(588, 1290)     //必需，底图大小
+                    .watermark(new Coordinate(185, 27), person, 1.0f)    //水印1 watermark(position，image，opacity)
+                    .watermark(Positions.CENTER, model, 1.0f)     //水印2
+                    .toFile(savePath);     //输出图片
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return savePath;
+    }
 
 
     /**
@@ -169,47 +202,18 @@ public class PhotoServiceImpl implements IPhotoService {
      * @author shijintao@supconit.com
      * @date 2020/5/25 09:51
      */
-    private String getFileName(Long userId, MultipartFile file) throws Exception {
+    private String getFileName(Long userId, String pathUrl, MultipartFile file) throws Exception {
         // 检查文件
-        checkImgValid(file);
+        FileUtil.checkImgValid(file);
         // 检查权限
-        Path dir = Paths.get(path);
+        Path dir = Paths.get(pathUrl);
 
         if (!Files.exists(dir)) {
             Files.createDirectory(dir);
         }
-        String fileType = getFileType(file);
+        String fileType = FileUtil.getFileType(file);
         UserPo user = userService.getById(userId);
-        return uuid() + "_" + user.getUserNum() + "." + fileType;
+        return FileUtil.uuid() + "_" + user.getUserNum() + "." + fileType;
     }
-
-    private String uuid() {
-        String uuid = UUID.randomUUID().toString();
-        return uuid.replaceAll("-", "");
-    }
-
-    private void checkImgValid(MultipartFile originFile) throws Exception {
-        //校验文件格式
-        if (originFile == null) {
-            throw new BaseException("未检测到文件");
-        }
-        if (originFile.getOriginalFilename() == null) {
-            throw new BaseException("文件名不能为空");
-        }
-        String suffixs = ".bmp.jpg.png.BMP.JPG.PNG.jpeg.JPEG";
-        String suffix = originFile.getOriginalFilename().substring(originFile.getOriginalFilename()
-                .lastIndexOf("."));
-        if (!suffixs.contains(suffix)) {
-            throw new BaseException("图片格式有误，必须为bmp, jpg, png，jpeg图片格式中的一种");
-        }
-    }
-
-    private String getFileType(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        assert originalFilename != null;
-        int i = originalFilename.lastIndexOf(".");
-        return originalFilename.substring(i + 1);
-    }
-
 
 }

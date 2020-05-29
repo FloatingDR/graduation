@@ -34,12 +34,12 @@ public class CodeGenerator {
     /**
      * 模块名
      */
-    private static final String MODULE_NAME = "user";
+    private static final String MODULE_NAME = "model";
 
     /**
      * 表名
      */
-    private static final String TABLE_NAME = "user_interface_confine";
+    private static final String TABLE_NAME = "model";
 
     /**
      * 包名

@@ -34,10 +34,4 @@ public class UserDto {
     @ApiModelProperty(value = "班级", example = "1602")
     private String className;
 
-    @ApiModelProperty(value = "图片地址", example = "D://user/photo/9df6897a52744983bdc8b844e4c2d7b9_20160511000.jpeg")
-    private String photo;
-
-    @ApiModelProperty(value = "抠图后的图片地址", example = "D://user/photo/9df6897a52744983bdc8b844e4c2d7b9_20160511000_analysed.jpeg")
-    private String analysedPhoto;
-
 }

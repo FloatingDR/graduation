@@ -175,9 +175,6 @@ public class UserController {
     private UserDto transPo2Dto(UserPo po) {
         UserDto result = new UserDto();
         BeanUtils.copyProperties(po, result);
-        if (!po.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
-            result.setAnalysedPhoto(null);
-        }
         return result;
     }
 

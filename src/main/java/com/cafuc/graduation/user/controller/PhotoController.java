@@ -1,10 +1,8 @@
 package com.cafuc.graduation.user.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
-import com.cafuc.graduation.user.entity.po.InterfaceConfinePo;
 import com.cafuc.graduation.user.entity.po.UserPo;
 import com.cafuc.graduation.user.service.IInterfaceConfineService;
 import com.cafuc.graduation.user.service.IPhotoService;
@@ -17,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +42,9 @@ public class PhotoController {
 
     @Value("${interfaceLimit.photoAnalyse.interfacePath}")
     private String photoAnalyseInterfacePath;
+
+    @Value("${photo.modelId}")
+    private Long defaultModelId;
 
     private final IUserService userService;
     private final IPhotoService photoService;
@@ -145,6 +146,27 @@ public class PhotoController {
         Integer state = userPo.getAnalysedState();
         String message = MESSAGE_MAP.get(state);
         return HttpResult.success(state, message);
+    }
+
+    @GetMapping("/download/clothesPhoto/{userId}")
+    @ApiOperation(value = "下载我的学士服照片", notes = "下载我的学士服照片")
+    public ResponseEntity<byte[]> downloadClothesPhoto(@PathVariable @ApiParam("用户id") Long userId) {
+        UserPo userPo = userService.getById(userId);
+        if (userPo == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        }
+        // 下载之前验证一下抠图图片是否成功生成
+        if (!userPo.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
+            log.info("用户之前{}没有上传图片，无法下载学士服照片", userId);
+            return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        }
+        // 如果有的话，直接下载，没有的话先合成再下载
+        String clothesPath = userPo.getClothesPath();
+        if (StringUtils.isEmpty(clothesPath)) {
+            clothesPath = photoService.composite(userPo, defaultModelId);
+        }
+        // 下载抠图图片
+        return FileUtil.httpDownloadFile(clothesPath);
     }
 
 }
