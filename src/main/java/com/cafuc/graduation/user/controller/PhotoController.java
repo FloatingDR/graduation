@@ -61,7 +61,7 @@ public class PhotoController {
     @ApiOperation(value = "上传照片", notes = "上传照片")
     public HttpResult<Boolean> upload(@PathVariable @ApiParam("用户id") Long id,
                                       @RequestParam(name="file") @ApiParam("照片") MultipartFile file) throws Exception {
-        // 先检测是还可以调用该接口
+        // 先检测是否还可以调用该接口
         if (interfaceConfineService.getByUserId(id) != null) {
             String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
             String[] invokingArr = invokingAble.split("_");
