@@ -3,8 +3,6 @@ package com.cafuc.graduation.user.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
 import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.LoginBo;

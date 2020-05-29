@@ -1,11 +1,8 @@
 package com.cafuc.graduation.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cafuc.graduation.user.dao.UserDao;
-import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.LoginBo;
 import com.cafuc.graduation.user.entity.po.LoginPo;
 import com.cafuc.graduation.user.entity.po.UserPo;

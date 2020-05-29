@@ -1,7 +1,6 @@
 package com.cafuc.graduation.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.LoginBo;
 import com.cafuc.graduation.user.entity.po.UserPo;
 

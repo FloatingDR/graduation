@@ -53,7 +53,6 @@ public class ModelServiceImpl extends ServiceImpl<ModelDao, ModelPo> implements 
     private String getFileName(MultipartFile file, String filePath) throws Exception {
         // 检查文件
         FileUtil.checkImgValid(file);
-        // 检查权限
         Path dir = Paths.get(filePath);
 
         if (!Files.exists(dir)) {
