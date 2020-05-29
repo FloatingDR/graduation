@@ -3,6 +3,7 @@ package com.cafuc.graduation.user.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cafuc.graduation.common.Constant;
 import com.cafuc.graduation.response.HttpResult;
 import com.cafuc.graduation.user.entity.bo.InsertBo;
 import com.cafuc.graduation.user.entity.bo.LoginBo;
@@ -173,6 +174,9 @@ public class UserController {
     private UserDto transPo2Dto(UserPo po) {
         UserDto result = new UserDto();
         BeanUtils.copyProperties(po, result);
+        if (!po.getAnalysedState().equals(Constant.ANALYSED_SUCCESS)) {
+            result.setAnalysedPhoto(null);
+        }
         return result;
     }
 
