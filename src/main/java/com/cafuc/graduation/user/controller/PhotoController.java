@@ -19,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -57,11 +59,11 @@ public class PhotoController {
         this.interfaceConfineService = interfaceConfineService;
     }
 
-    @PostMapping(value = "/upload/{id}")
+    @PostMapping("/upload/{id}")
     @ApiOperation(value = "上传照片", notes = "上传照片")
     public HttpResult<Boolean> upload(@PathVariable @ApiParam("用户id") Long id,
-                                      @RequestPart(name = "file") @ApiParam("照片") MultipartFile file) throws Exception {
-        // 先检测是否还可以调用该接口
+                                      @RequestParam(name="file") @ApiParam("照片") MultipartFile file) throws Exception {
+        // 先检测是还可以调用该接口
         if (interfaceConfineService.getByUserId(id) != null) {
             String invokingAble = interfaceConfineService.queryInvokingAble(id, photoAnalyseInterfacePath);
             String[] invokingArr = invokingAble.split("_");
