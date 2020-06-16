@@ -4,8 +4,10 @@ server:
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/graduation_photo?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8&useSSL=true
-    username: taylor
-    password: taylor
+#    username: taylor
+#    password: taylor
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # 初始化大小，最小，最大
@@ -51,13 +53,15 @@ baidu:
 # 模板
 model:
   # 模板存放地址绝对路径
-  url: /Users/taylor/springboot/graduation/src/main/resources/model/
+  url: /Users/84612/Desktop/graduation/src/main/resources/model/
+#  url: /Users/taylor/springboot/graduation/src/main/resources/model/
 
 photo:
   # 学士服照片默认模板
   modelId: 1
   # 照片存放地址绝对路径
-  url: /Users/taylor/springboot/graduation/src/main/resources/photo/
+  url: /Users/84612/Desktop/graduation/src/main/resources/photo/
+#  url: /Users/taylor/springboot/graduation/src/main/resources/photo/
   # AI抠图照片后缀
   analysed_suffix: analysed
   # 学士服照片后缀
